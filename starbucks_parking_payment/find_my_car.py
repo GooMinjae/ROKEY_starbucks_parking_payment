@@ -3,9 +3,9 @@
 # 정의 서류 온전히 준수 
 
 import sys 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QHBoxLayout, QGridLayout, QVBoxLayout, QSpacerItem, QSizePolicy
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 import os
 
 base_path = os.path.dirname(os.path.realpath(__file__))
