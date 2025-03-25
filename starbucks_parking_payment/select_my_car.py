@@ -3,7 +3,8 @@
 # 스스로 더미 데이터 만들어 코드 작성, Unit Test
 
 import sys 
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton
+from PyQt5.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
