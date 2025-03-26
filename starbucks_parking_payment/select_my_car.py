@@ -12,29 +12,33 @@ import os
 
 from datetime import datetime, timedelta
 
-# 차량 데이터 샘플
-def car_data(user_car_data):
-    entry_time = datetime.now()
+'''
+모듈 호출 시 더미 데이터가 들어감 -> 데이터는 처리 후 해당 모듈이 실행되어야함 ???????
+실행 되기도 전에 등록 되면 안됨
+'''
+# # 차량 데이터 샘플
+# def car_data(user_car_data):
+#     entry_time = datetime.now()
 
-    car_data_list = [
-        {"번호": "123가 4567", "입차시간": (entry_time - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")},
-        {"번호": "245가 4567", "입차시간": (entry_time - timedelta(minutes=80)).strftime("%Y-%m-%d %H:%M:%S")},
-        {"번호": "112가 4567", "입차시간": (entry_time - timedelta(minutes=120)).strftime("%Y-%m-%d %H:%M:%S")}
-    ]
+#     car_data_list = [
+#         {"번호": "123가 4567", "입차시간": (entry_time - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")},
+#         {"번호": "245가 4567", "입차시간": (entry_time - timedelta(minutes=80)).strftime("%Y-%m-%d %H:%M:%S")},
+#         {"번호": "112가 4567", "입차시간": (entry_time - timedelta(minutes=120)).strftime("%Y-%m-%d %H:%M:%S")}
+#     ]
 
-    if user_car_data:
-        car_data_list = [
-            car for car in car_data_list
-            if user_car_data in car["번호"].split(" ")[1]
-        ]
+#     if user_car_data:
+#         car_data_list = [
+#             car for car in car_data_list
+#             if user_car_data in car["번호"].split(" ")[1]
+#         ]
 
-    return car_data_list
+#     return car_data_list
 
 base_path = os.path.dirname(os.path.realpath(__file__))
 base_path = base_path.replace("\\", "/")
 
 class SelectMyCarInfoScreen(QWidget):
-    def __init__(self, user_car_data="4567"):
+    def __init__(self, car_data_list):
         super().__init__()
         self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
         self.setGeometry(300, 300, 800, 400)
@@ -43,8 +47,8 @@ class SelectMyCarInfoScreen(QWidget):
         layout_space = 20
 
         # select car data
-        self.user_car_data = user_car_data
-        car_data_list = car_data(self.user_car_data)
+        self.car_data_list = car_data_list
+        # car_data_list = car_data(self.user_car_data)
 
         # guide label
         guide_label = QLabel()
@@ -93,14 +97,14 @@ class SelectMyCarInfoScreen(QWidget):
                                     """)
         self.table_list.setColumnCount(2)
         self.table_list.setHorizontalHeaderLabels(column_title) # set column title
-        self.table_list.setRowCount(len(car_data_list))
+        self.table_list.setRowCount(len(self.car_data_list))
         self.table_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) # table size stretch
         self.table_list.setSelectionMode(QTableWidget.SingleSelection)
         self.table_list.setSelectionBehavior(QTableWidget.SelectRows) # select entire rows
         self.table_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_list.itemSelectionChanged.connect(self.car_select) # event
 
-        for i, value in enumerate(car_data_list):
+        for i, value in enumerate(self.car_data_list):
             self.table_list.setItem(i, 0, QTableWidgetItem(value["번호"]))
             self.table_list.setItem(i, 1, QTableWidgetItem(value["입차시간"]))
         self.table_list.selectRow(0)
@@ -153,7 +157,15 @@ class SelectMyCarInfoScreen(QWidget):
 
 
 if __name__ == "__main__":
+    # 단위 테스트 시 dummy data
+    entry_time = datetime.now()
+
+    car_data_list = [
+        {"번호": "123가 4567", "입차시간": (entry_time - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")},
+        {"번호": "245가 4567", "입차시간": (entry_time - timedelta(minutes=80)).strftime("%Y-%m-%d %H:%M:%S")},
+        {"번호": "112가 4567", "입차시간": (entry_time - timedelta(minutes=120)).strftime("%Y-%m-%d %H:%M:%S")}
+    ]
     app = QApplication(sys.argv)
-    win = SelectMyCarInfoScreen()
+    win = SelectMyCarInfoScreen(car_data_list)
     win.show()
     app.exec_()
