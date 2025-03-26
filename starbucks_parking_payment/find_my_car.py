@@ -12,8 +12,9 @@ base_path = os.path.dirname(os.path.realpath(__file__))
 base_path = base_path.replace("\\", "/")
 
 class FindMyCarInfoScreen(QWidget):
-    def __init__(self):
+    def __init__(self, on_confirm_callback):
         super().__init__()
+        self.on_confirm_callback = on_confirm_callback
         self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
         self.setGeometry(300, 300, 600, 400)
         self.setStyleSheet("background-color: #252E3E;")
@@ -99,7 +100,8 @@ class FindMyCarInfoScreen(QWidget):
         elif text == "확인":
             value = "".join(field.text() for field in self.num_field)
             if 0 < len(value) <= 4:
-                print(f"입력된 차량 번호: {value}")
+                # print(f"입력된 차량 번호: {value}")
+                self.on_confirm_callback(value)
             else:
                 print("번호가 입력되지 않았습니다.")
         else:
@@ -110,7 +112,9 @@ class FindMyCarInfoScreen(QWidget):
 
 
 if __name__ == "__main__":
+    def handle_number_input(input_number):
+        print(f"입력된 차량번호: {input_number}")
     app = QApplication(sys.argv)
-    win = FindMyCarInfoScreen()
+    win = FindMyCarInfoScreen(handle_number_input)
     win.show()
     app.exec_()
