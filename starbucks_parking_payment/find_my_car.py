@@ -16,7 +16,7 @@ class FindMyCarInfoScreen(QWidget):
         super().__init__()
         self.on_confirm_callback = on_confirm_callback
         self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
-        self.setGeometry(300, 300, 600, 400)
+        # self.setGeometry(300, 300, 600, 400)
         self.setStyleSheet("background-color: #252E3E;")
 
         btn_size_x, btn_size_y = 70, 70

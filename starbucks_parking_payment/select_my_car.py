@@ -17,18 +17,17 @@ base_path = os.path.dirname(os.path.realpath(__file__))
 base_path = base_path.replace("\\", "/")
 
 class SelectMyCarInfoScreen(QWidget):
-    def __init__(self, handle_car_selection):
+    def __init__(self, on_confirm_callback):
         super().__init__()
         self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
-        self.setGeometry(300, 300, 800, 400)
+        # self.setGeometry(300, 300, 800, 400)
         self.setStyleSheet("background-color: #252E3E;")
         self.car_list = []
 
         layout_space = 20
 
         # select car data
-        self.handle_car_selection = handle_car_selection
-        # handle_car_selection = car_data(self.user_car_data)
+        self.on_confirm_callback = on_confirm_callback
 
         # guide label
         guide_label = QLabel()
@@ -77,17 +76,11 @@ class SelectMyCarInfoScreen(QWidget):
                                     """)
         self.table_list.setColumnCount(2)
         self.table_list.setHorizontalHeaderLabels(column_title) # set column title
-        # self.table_list.setRowCount(len(self.car_list))
         self.table_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) # table size stretch
         self.table_list.setSelectionMode(QTableWidget.SingleSelection)
         self.table_list.setSelectionBehavior(QTableWidget.SelectRows) # select entire rows
         self.table_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_list.itemSelectionChanged.connect(self.car_select) # event
-
-        # for i, value in enumerate(self.car_list):
-        #     self.table_list.setItem(i, 0, QTableWidgetItem(value["번호"]))
-        #     self.table_list.setItem(i, 1, QTableWidgetItem(value["입차시간"]))
-        # self.table_list.selectRow(0)
 
         ## layout
         # car image, confirm button layout
@@ -110,17 +103,7 @@ class SelectMyCarInfoScreen(QWidget):
         self.setLayout(main_layout)
 
     def load_data(self, car_list):
-        print(f"load data, {car_list}")
         self.car_list = car_list
-        # if car_list:
-        #     self.car_list = [
-        #         car for car in car_list
-        #         if car_list in car["번호"].split(" ")
-        #     ]
-
-        #     self.car_list = car_list
-        # # self.label.setText(f"조회된 차량 수: {len(car_list)}대")
-
         self.table_list.setRowCount(len(self.car_list))
 
         for i, value in enumerate(self.car_list):
@@ -149,8 +132,8 @@ class SelectMyCarInfoScreen(QWidget):
 
     def click_confirm_btn(self):
         if self.selected_rows:
-            print(f"선택된 차량: {self.car_number}, 입차 시간: {self.entry_time}")
-            self.handle_car_selection = self.car_number, self.entry_time
+            # print(f"선택된 차량: {self.car_number}, 입차 시간: {self.entry_time}")
+            self.on_confirm_callback(self.car_number, self.entry_time)
         else:
             print("선택된 항목이 없습니다.")
 

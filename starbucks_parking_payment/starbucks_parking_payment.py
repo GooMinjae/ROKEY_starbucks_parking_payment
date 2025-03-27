@@ -36,7 +36,8 @@ class MainWindow(QStackedWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.setWindowTitle("QStackedWidget 기본 예제")
+    window.setWindowTitle("iPARKING")
+    window.setStyleSheet("background-color: #252E3E;")
     window.resize(600, 300)
     window.show()
     sys.exit(app.exec())
