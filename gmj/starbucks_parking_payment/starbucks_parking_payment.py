@@ -1,6 +1,5 @@
-### 시스템의 critical point 판단
 from find_my_car import FindMyCarInfoScreen
-from select_my_car import SelectMyCarInfoScreen # minseok
+from select_my_car_minseok import SelectMyCarInfoScreen # minseok
 
 import sys
 from PyQt5.QtWidgets import QApplication, QStackedWidget
