@@ -1,7 +1,3 @@
-# 과제
-# 번호판 화면 / 기능 정의서
-# 정의 서류 온전히 준수 
-
 import sys 
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QHBoxLayout, QGridLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QFont
@@ -15,7 +11,7 @@ class FindMyCarInfoScreen(QWidget):
     def __init__(self, on_confirm_callback):
         super().__init__()
         self.on_confirm_callback = on_confirm_callback
-        self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
+        self.setWindowTitle("iPARKING 주차정산기")
         # self.setGeometry(300, 300, 600, 400)
         self.setStyleSheet("background-color: #252E3E;")
 
@@ -100,7 +96,6 @@ class FindMyCarInfoScreen(QWidget):
         elif text == "확인":
             value = "".join(field.text() for field in self.num_field)
             if 0 < len(value) <= 4:
-                # print(f"입력된 차량 번호: {value}")
                 self.on_confirm_callback(value)
             else:
                 print("번호가 입력되지 않았습니다.")

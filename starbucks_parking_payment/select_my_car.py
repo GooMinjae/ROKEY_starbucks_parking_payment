@@ -1,7 +1,3 @@
-# SelectMyCarInfoScreen
-# 다른 시스템, 모듈 연동 고려
-# 스스로 더미 데이터 만들어 코드 작성, Unit Test
-
 import sys 
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton
 from PyQt5.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView
@@ -19,14 +15,13 @@ base_path = base_path.replace("\\", "/")
 class SelectMyCarInfoScreen(QWidget):
     def __init__(self, on_confirm_callback):
         super().__init__()
-        self.setWindowTitle("iPARKING 주차정산기(GooMinjae)")
+        self.setWindowTitle("iPARKING - 차량번호 확인")
         # self.setGeometry(300, 300, 800, 400)
         self.setStyleSheet("background-color: #252E3E;")
         self.car_list = []
 
         layout_space = 20
 
-        # select car data
         self.on_confirm_callback = on_confirm_callback
 
         # guide label
@@ -139,6 +134,11 @@ class SelectMyCarInfoScreen(QWidget):
 
 
 if __name__ == "__main__":
+    def handle_car_selection(car_number, entry_time):
+        print("[콜백 호출됨]")
+        print("차량번호:", car_number)
+        print("입차시간:", entry_time)
+
     # 단위 테스트 시 dummy data
     entry_time = datetime.now()
 
@@ -148,6 +148,7 @@ if __name__ == "__main__":
         {"번호": "112가 4567", "입차시간": (entry_time - timedelta(minutes=120)).strftime("%Y-%m-%d %H:%M:%S")}
     ]
     app = QApplication(sys.argv)
-    win = SelectMyCarInfoScreen(dummy_data)
+    win = SelectMyCarInfoScreen(handle_car_selection)
+    win.load_data(dummy_data)
     win.show()
     app.exec_()
