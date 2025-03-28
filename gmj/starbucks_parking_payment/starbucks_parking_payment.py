@@ -3,6 +3,7 @@ from select_my_car_minseok import SelectMyCarInfoScreen # minseok
 
 import sys
 from PyQt5.QtWidgets import QApplication, QStackedWidget
+from datetime import datetime, timedelta
 
 # 메인 윈도우: 화면 전환을 담당하는 QStackedWidget
 class MainWindow(QStackedWidget):
@@ -21,9 +22,16 @@ class MainWindow(QStackedWidget):
         print(f"[입력된 차량번호] {number}")
 
         # 더미 데이터 조회처럼 처리
+        # dummy_data = [
+        #     {"번호": f"{number}가 {number}", "입차시간": "2025-03-26 09:00:00"},
+        #     {"번호": f"{number}가 {number}", "입차시간": "2025-03-26 08:45:00"},
+        # ]
+        
+        entry_time = datetime.now()
         dummy_data = [
-            {"번호": f"{number}가 1111", "입차시간": "2025-03-26 09:00:00"},
-            {"번호": f"{number}가 2222", "입차시간": "2025-03-26 08:45:00"},
+            {"번호": f"123가 {number}", "입차시간": (entry_time - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")},
+            {"번호": f"245가 {number}", "입차시간": (entry_time - timedelta(minutes=80)).strftime("%Y-%m-%d %H:%M:%S")},
+            {"번호": f"112가 {number}", "입차시간": (entry_time - timedelta(minutes=120)).strftime("%Y-%m-%d %H:%M:%S")}
         ]
         self.second.load_data(dummy_data)
         self.setCurrentIndex(1)
