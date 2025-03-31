@@ -1,6 +1,7 @@
 import cv2
 from pyzbar.pyzbar import decode
 import winsound
+from datetime import datetime
 
 class Barcode:
     def __init__(self):
@@ -41,9 +42,7 @@ if __name__ == "__main__":
         processed_frame, barcode_info, detected = barcode.recognize_barcode(frame)
         cv2.imshow("Barcode Scanner", processed_frame)
         if detected:    # 바코드 인식되면 종료
-            print(f"날짜: {barcode_info['date']}")
-            print(f"시간: {barcode_info['time']}")
-            print(f"무료금액: {barcode_info['price']}")
+            nowdate = datetime.strptime(barcode_info, '%Y%m%d%H%M%S') ############### 이후에 수정 필요
             break
         if cv2.waitKey(1) & 0xFF == ord('q'):   # 'q'로 수동 종료도 가능
             break
