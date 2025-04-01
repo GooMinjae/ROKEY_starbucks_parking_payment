@@ -16,7 +16,7 @@ class BarcodeGenerator:
     def create_bar_code(self):
         """ 날짜, 시간, 무료 금액 정보를 포함한 바코드 생성 """
         now = datetime.now().strftime("%Y%m%d%H%M%S")
-        bar_data = f"{now}{self.free_amount}"
+        bar_data = f"{now}-{self.free_amount}"
 
         # 바코드 생성 (Code128 바코드 형식 사용)
         code128 = barcode.get_barcode_class('code128')
