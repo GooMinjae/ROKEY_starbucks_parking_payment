@@ -3,6 +3,7 @@ import cv2
 from PyQt5.QtWidgets import QApplication, QLabel, QTextEdit, QVBoxLayout, QWidget
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
+from datetime import datetime
 from barcode_thread import BarcodeScannerWorker
 
 class BarcodeScannerApp(QWidget):
@@ -37,14 +38,17 @@ class BarcodeScannerApp(QWidget):
         qt_image = QImage(rgb_frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
         self.video_label.setPixmap(QPixmap.fromImage(qt_image))
     
-    def display_barcode_info(self, info):
-        self.barcode_info.append(f'날짜: {info["date"]}\n시간: {info["time"]}\n가격: {info["price"]}')
-        print(f'날짜: {info["date"]}\n시간: {info["time"]}\n가격: {info["price"]}')   # 테스트용 출력
+    def display_barcode_info(self, barcode_data):
+        obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
+        free_amount = barcode_data.split('-')[1]
+
+        self.barcode_info.append(f'날짜: {obj_nowdate.date()}\n시간: {obj_nowdate.time()}\n가격: {free_amount}')
+        # print(f'날짜: {info["date"]}\n시간: {info["time"]}\n가격: {info["price"]}')   # 테스트용 출력
         self.close_app()
     
     def close_app(self):
         self.scanner_worker.stop()
-        self.close()
+        # self.close()
 
     # def keyPressEvent(self, event):
     #     if event.key() == Qt.Key_Q:  # 'q' 버튼 누르면 종료

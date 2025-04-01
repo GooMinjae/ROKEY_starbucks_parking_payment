@@ -7,7 +7,7 @@ from datetime import datetime
 
 class BarcodeScannerWorker(QObject):
     frameCaptured = pyqtSignal(object)  # 프레임 업데이트 신호
-    barcodeDetected = pyqtSignal(dict)  # 바코드 정보 신호
+    barcodeDetected = pyqtSignal(str)  # 바코드 정보 신호
 
     def __init__(self):
         super().__init__()
@@ -38,7 +38,7 @@ class BarcodeScannerWorker(QObject):
     
     def recognize_barcode(self, frame):
         barcodes = decode(frame)
-        info = {}
+        barcode_data = None
         for barcode in barcodes:
             if barcode.type == 'PDF417':
                 continue
@@ -50,17 +50,20 @@ class BarcodeScannerWorker(QObject):
             cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                         0.9, (0, 255, 0), 2)
             winsound.Beep(1000, 200)
+            # print(type(barcode_data))
             
-            try:
-                obj_nowdate = datetime.strptime(barcode_data[:14], "%Y%m%d%H%M%S")
-                formatted_date = obj_nowdate.strftime("%Y-%m-%d")
-                formatted_time = obj_nowdate.strftime("%H:%M:%S")
-                info = {'date': formatted_date, 'time': formatted_time, 'price': barcode_data[14:]}
-            except ValueError:
-                info = {'date': 'Invalid', 'time': 'Invalid', 'price': barcode_data[14:]}
-            
-            return frame, info, True
-        return frame, info, False
+            # try:
+            #     obj_nowdate = datetime.strptime(barcode_data[:14], "%Y%m%d%H%M%S")
+            #     formatted_date = obj_nowdate.strftime("%Y-%m-%d")
+            #     formatted_time = obj_nowdate.strftime("%H:%M:%S")
+            #     info = {'date': formatted_date, 'time': formatted_time, 'price': barcode_data[14:]}
+            # except ValueError:
+            # #     info = {'date': 'Invalid', 'time': 'Invalid', 'price': barcode_data[14:]}
+            # obj_nowdate = datetime.strptime(barcode_data.strip('-')[0], "%Y%m%d%H%M%S")
+            # free_amount = barcode_data.strip('-')[1]
+            # info = {'datetime':obj_nowdate, 'price':free_amount}
+            return frame, barcode_data, True
+        return frame, barcode_data, False
     
     def stop(self):
         self.running = False
@@ -77,12 +80,17 @@ if __name__ == "__main__":
         if not ret:
             continue
 
-        frame, info, detected = worker.recognize_barcode(frame)
+        frame, barcode_data, detected = worker.recognize_barcode(frame)
         cv2.imshow("Barcode Scanner", frame)
 
+
+
         if detected:
+            obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
+            free_amount = barcode_data.split('-')[1]
+            # info = {'datetime':obj_nowdate, 'price':free_amount}
             print("바코드 감지됨:")
-            print(f"날짜: {info['date']}, 시간: {info['time']}, 가격: {info['price']}")
+            print(f"날짜: {obj_nowdate}, 가격: {free_amount}")
             break
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
