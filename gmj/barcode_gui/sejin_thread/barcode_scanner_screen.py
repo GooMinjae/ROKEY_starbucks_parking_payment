@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QTextEdit, QVBoxLayout, QWidge
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
 from datetime import datetime
-from barcode_thread import BarcodeScannerWorker
+from barcode_scanner import BarcodeScannerWorker
 
 class BarcodeScannerApp(QWidget):
     def __init__(self):
