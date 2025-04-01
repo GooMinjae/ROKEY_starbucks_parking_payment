@@ -5,6 +5,14 @@ import winsound
 from PyQt5.QtCore import pyqtSignal, QObject
 from datetime import datetime
 
+'''
+Thread 사용 이유
+간단한 프로젝트에서는 QTimer가 UI 이벤트 루프에서 동작하여 간편하고 유용하지만,
+프로젝트의 확장성을 우려하고, 카메라와 UI를 독립적으로 나누기 위해 Thread 선택
+또한, 명시적인 스레드 종료 및 자원 해제를 통해 라이프 사이클을 완전히 컨트롤 할 수 있다.
+'''
+
+
 class BarcodeScannerWorker(QObject):
     frameCaptured = pyqtSignal(object)  # 프레임 업데이트 신호
     barcodeDetected = pyqtSignal(str)  # 바코드 정보 신호
