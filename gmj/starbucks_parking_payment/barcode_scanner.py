@@ -1,16 +1,54 @@
 import cv2
+import threading
 from pyzbar.pyzbar import decode
 import winsound
+from PyQt5.QtCore import pyqtSignal, QObject
+from datetime import datetime
 
-class Barcode:
+'''
+Thread 사용 이유
+간단한 프로젝트에서는 QTimer가 UI 이벤트 루프에서 동작하여 간편하고 유용하지만,
+프로젝트의 확장성을 우려하고, 카메라와 UI를 독립적으로 나누기 위해 Thread 선택
+또한, 명시적인 스레드 종료 및 자원 해제를 통해 라이프 사이클을 완전히 컨트롤 할 수 있다.
+'''
+
+
+class BarcodeScannerWorker(QObject):
+    frameCaptured = pyqtSignal(object)  # 프레임 업데이트 신호
+    barcodeDetected = pyqtSignal(str)  # 바코드 정보 신호
+
     def __init__(self):
-        self.detected = False
+        super().__init__()
+        self.running = False
+        self.cap = cv2.VideoCapture(0)
+        self.thread = None  # 스레드 객체
 
+    def start(self):
+        if self.thread is None or not self.thread.is_alive():  # 기존 스레드가 없거나 종료되었을 때만 실행
+            self.running = True
+            self.thread = threading.Thread(target=self.run)
+            self.thread.start()
+
+    def run(self):
+        while self.running:
+            ret, frame = self.cap.read()
+            if not ret:
+                continue
+            
+            processed_frame, barcode_info, detected = self.recognize_barcode(frame)
+            self.frameCaptured.emit(processed_frame)
+            
+            if detected:
+                self.barcodeDetected.emit(barcode_info)
+                self.running = False
+                
+        self.cap.release()
+    
     def recognize_barcode(self, frame):
         barcodes = decode(frame)
-        info = {}
+        barcode_data = None
         for barcode in barcodes:
-            if barcode.type == 'PDF417':  # PDF417 바코드는 무시
+            if barcode.type == 'PDF417':
                 continue
             x, y, w, h = barcode.rect
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -20,42 +58,51 @@ class Barcode:
             cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                         0.9, (0, 255, 0), 2)
             winsound.Beep(1000, 200)
-            print(f'[INFO] 바코드 인식됨: {barcode_type} - {barcode_data}')
-            info = {'date':barcode_data[:8], 'time':barcode_data[8:14], 'price':barcode_data[14:]}
-            self.detected = True
-            return frame, info, True  # 인식되면 True 반환 → 종료
-        return frame, info, False  # 인식 안 됨
+            # print(type(barcode_data))
+            
+            # try:
+            #     obj_nowdate = datetime.strptime(barcode_data[:14], "%Y%m%d%H%M%S")
+            #     formatted_date = obj_nowdate.strftime("%Y-%m-%d")
+            #     formatted_time = obj_nowdate.strftime("%H:%M:%S")
+            #     info = {'date': formatted_date, 'time': formatted_time, 'price': barcode_data[14:]}
+            # except ValueError:
+            # #     info = {'date': 'Invalid', 'time': 'Invalid', 'price': barcode_data[14:]}
+            # obj_nowdate = datetime.strptime(barcode_data.strip('-')[0], "%Y%m%d%H%M%S")
+            # free_amount = barcode_data.strip('-')[1]
+            # info = {'datetime':obj_nowdate, 'price':free_amount}
+            return frame, barcode_data, True
+        return frame, barcode_data, False
+    
+    def stop(self):
+        self.running = False
+        if self.thread:
+            self.thread.join()
 
 
-# 단위 테스트
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    print("바코드를 스캔하려면 웹캠 앞에 바코드를 보여주세요.")
-    barcode = Barcode()
+    worker = BarcodeScannerWorker()
 
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("웹캠을 사용할 수 없습니다.")
+            continue
+
+        frame, barcode_data, detected = worker.recognize_barcode(frame)
+        cv2.imshow("Barcode Scanner", frame)
+
+
+
+        if detected:
+            obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
+            free_amount = barcode_data.split('-')[1]
+            # info = {'datetime':obj_nowdate, 'price':free_amount}
+            print("바코드 감지됨:")
+            print(f"날짜: {obj_nowdate}, 가격: {free_amount}")
             break
-        processed_frame, barcode_info, detected = barcode.recognize_barcode(frame)
-        cv2.imshow("Barcode Scanner", processed_frame)
-        if detected:    # 바코드 인식되면 종료
-            print(f"날짜: {barcode_info['date']}")
-            print(f"시간: {barcode_info['time']}")
-            print(f"무료금액: {barcode_info['price']}")
-            break
-        if cv2.waitKey(1) & 0xFF == ord('q'):   # 'q'로 수동 종료도 가능
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     cap.release()
     cv2.destroyAllWindows()
-
-
-# PyQt 연동 시 사용 예시 코드
-# ret, frame = self.cap.read()
-# if ret:
-#     processed_frame, barcode_info, detected = self.barcode.recognize_barcode(frame) # return frame, info, True
-#     # processed_frame을 QLabel 등에 표시
-#     if detected:
-#         self.timer.stop()  # 또는 필요한 동작 수행

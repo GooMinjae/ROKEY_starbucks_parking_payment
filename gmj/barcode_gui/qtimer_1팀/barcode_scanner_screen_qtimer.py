@@ -1,9 +1,10 @@
 import sys
 import cv2
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PySide6.QtCore import QTimer
-from PySide6.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QImage, QPixmap
 from barcode_scanner import Barcode
+
 
 class BarcodeApp(QWidget):
     def __init__(self):
