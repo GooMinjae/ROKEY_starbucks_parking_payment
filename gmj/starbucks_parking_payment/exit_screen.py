@@ -13,13 +13,14 @@ class ExitScreen(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("Exit Screen")
-        self.setGeometry(100, 100, 600, 400)
+        # self.setGeometry(100, 100, 800, 600)
+        self.resize(600, 300)
         self.setStyleSheet("background-color: #0E291B;")
 
 
         base_path = os.path.dirname(os.path.realpath(__file__))
         base_path = base_path.replace("\\", "/")
-        image_path = f'{base_path}/img/check_img.png'
+        image_path = f'{base_path}/img/icons/check_img.png'
 
         check_img = QLabel()
         if os.path.exists(image_path):
@@ -51,5 +52,6 @@ class ExitScreen(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ExitScreen()
+    # window.resize(600, 300)
     window.show()
     sys.exit(app.exec_())
