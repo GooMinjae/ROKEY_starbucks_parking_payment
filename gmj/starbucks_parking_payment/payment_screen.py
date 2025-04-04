@@ -8,22 +8,26 @@ from exit_screen import ExitScreen  # ExitScreen 호출
 from sbuck_style import SBUCKStyle
 
 class PaymentScreen(QWidget):
-    def __init__(self, car_number, entry_time_str, discount_amount):
+    def __init__(self, on_timer_callback):
         super().__init__()
         self.setStyleSheet("background-color: #1E2D3D; color: white;")
+        self.on_timer_callback = on_timer_callback
         
-        # 차량 정보
-        self.car_number = car_number
-        self.entry_time = datetime.strptime(entry_time_str, "%Y.%m.%d %H:%M:%S")
-        self.discount = discount_amount
-        self.now = datetime.now()
+        # # 차량 정보
+        # obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
+        # discount_amount = barcode_info.split('-')[1]
+
+        # self.car_number = car_number
+        # self.entry_time = datetime.strptime(entry_time_str, "%Y.%m.%d %H:%M:%S")
+        # self.discount = discount_amount
+        # self.now = datetime.now()
         
-        # 요금 계산
-        self.duration_str, self.fee, self.payment = self.calculate_fee()
+        # # 요금 계산
+        # self.duration_str, self.fee, self.payment = self.calculate_fee()
         
-        # 차량 이미지 파일명 설정
-        image_name = f"car_{car_number}.png"
-        self.init_ui(image_name)
+        # # 차량 이미지 파일명 설정
+        # image_name = f"car_{car_number}.png"
+        # self.init_ui(image_name)
     
     def calculate_fee(self):
         """주차 요금 계산"""
@@ -135,23 +139,46 @@ class PaymentScreen(QWidget):
 
         # 2초 후 ExitScreen으로 이동
         # QTimer.singleShot(2000, self.show_exit_screen)
+        QTimer.singleShot(2000, self.on_timer_callback)
 
-    def show_exit_screen(self):
-        """ExitScreen으로 전환"""
-        self.exit_window = ExitScreen()
-        self.exit_window.show()
-        self.close()
+    # def show_exit_screen(self):
+    #     """ExitScreen으로 전환"""
+    #     self.exit_window = ExitScreen()
+    #     self.exit_window.show()
+    #     self.close()
+
+    def load_car_data(self, barcode_info, car_number, entry_time_str):
+        self.car_number = car_number
+        self.entry_time_str = entry_time_str
+        self.barcode_info = barcode_info
+
+        # 차량 정보
+        obj_nowdate = datetime.strptime(barcode_info.split('-')[0], "%Y%m%d%H%M%S")
+        discount_amount = int(barcode_info.split('-')[1])
+
+        self.entry_time = datetime.strptime(self.entry_time_str, "%Y-%m-%d %H:%M:%S")
+        self.discount = discount_amount
+        self.now = datetime.now()
+        
+        # 요금 계산
+        self.duration_str, self.fee, self.payment = self.calculate_fee()
+        
+        # 차량 이미지 파일명 설정
+        image_name = f"car_{self.car_number}.png"
+        self.init_ui(image_name)
+
 
 # 실행 테스트
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    screen = PaymentScreen(
-        car_number="112가 4567",
-        entry_time_str="2025.04.02 13:00:00",
-        discount_amount=3500
-    )
+    screen = PaymentScreen()
     screen.setWindowTitle("I PARKING - 차량 요금 정산 화면")
     screen.resize(700, 400)
     # screen.resize(700, 350)
+    screen.load_car_data(
+            barcode_info="2025041224815-5000",
+            car_number="112가 4567",
+            entry_time_str="2025-04-02 13:00:00",
+        )
     screen.show()
     sys.exit(app.exec_())

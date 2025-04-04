@@ -8,7 +8,6 @@ class ExitScreen(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
-        QTimer.singleShot(100, self.speak)  # 0.1초 후 TTS 실행
 
 
     def init_ui(self):

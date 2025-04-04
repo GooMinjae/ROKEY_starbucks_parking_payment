@@ -8,8 +8,9 @@ from barcode_scanner import BarcodeScannerWorker
 from sbuck_style import SBUCKStyle
 
 class BarcodeScannerApp(QWidget):
-    def __init__(self):
+    def __init__(self, on_barcode_callback):
         super().__init__()
+        self.on_barcode_callback = on_barcode_callback
         self.initUI()
 
     def initUI(self):
@@ -17,7 +18,7 @@ class BarcodeScannerApp(QWidget):
         self.resize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
         # self.setGeometry(100, 100, 700, 400)
         self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
-        
+
         self.video_label = QLabel(self, text="카메라 화면")
         self.video_label.setFixedSize(320, 240)
         self.video_label.setAlignment(Qt.AlignCenter)
@@ -67,6 +68,7 @@ class BarcodeScannerApp(QWidget):
 
         self.barcode_info.setText(f'날짜: {obj_nowdate.date()}\n시간: {obj_nowdate.time()}\n가격: {free_amount}')
         print(f'날짜: {obj_nowdate.date()}\n시간: {obj_nowdate.time()}\n가격: {free_amount}')   # 테스트용 출력
+        self.on_barcode_callback(barcode_data)
         self.close_app()
     
     def close_app(self):
