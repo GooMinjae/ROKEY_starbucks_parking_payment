@@ -5,6 +5,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
 from datetime import datetime
 from barcode_scanner import BarcodeScannerWorker
+from sbuck_style import SBUCKStyle
 
 class BarcodeScannerApp(QWidget):
     def __init__(self):
@@ -13,11 +14,12 @@ class BarcodeScannerApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle('바코드 스캐너')
-        self.setGeometry(100, 100, 640, 480)
-        self.setStyleSheet("background-color: #252E3E;")
+        self.resize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
+        # self.setGeometry(100, 100, 700, 400)
+        self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
         
         self.video_label = QLabel(self, text="카메라 화면")
-        self.video_label.setFixedSize(640, 480)
+        self.video_label.setFixedSize(320, 240)
         self.video_label.setAlignment(Qt.AlignCenter)
         self.video_label.setStyleSheet('color: #FFFFFF;\
                                         border-radius: 5;\
@@ -28,31 +30,20 @@ class BarcodeScannerApp(QWidget):
         self.scan_button = QPushButton("스캔 시작")
         self.scan_button.clicked.connect(self.start_scanning)
         self.scan_button.setFixedHeight(50)
-        self.scan_button.setStyleSheet("""
-                                    QPushButton {
-                                        background-color: #134F9E;
-                                        color: #FFFFFF;
-                                        border-radius: 5;
-                                    }
-                                    QPushButton:hover {
-                                        background-color: #0F3F80;
-                                    }
-                                    QPushButton:pressed {
-                                        background-color: #0B2B57;
-                                    }
-                                """)
+        self.scan_button.setStyleSheet(SBUCKStyle.STYLE_CONFIRM_BTN)
         
         # self.barcode_info = QTextEdit(self)
         # self.barcode_info.setReadOnly(True)
         self.barcode_info = QLabel("")
         self.barcode_info.setAlignment(Qt.AlignCenter)
-        self.barcode_info.setFixedHeight(80)
+        self.barcode_info.setFixedHeight(50)
         self.barcode_info.setStyleSheet("color: #FFFFFF;")
         
         layout = QVBoxLayout()
         layout.addWidget(self.video_label)
         layout.addWidget(self.barcode_info)
         layout.addWidget(self.scan_button)
+        layout.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
 
     # 버튼 연결안할 시 init으로
@@ -80,11 +71,6 @@ class BarcodeScannerApp(QWidget):
     
     def close_app(self):
         self.scanner_worker.stop()
-        # self.close()
-
-    # def keyPressEvent(self, event):
-    #     if event.key() == Qt.Key_Q:  # 'q' 버튼 누르면 종료
-    #         self.close_app()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

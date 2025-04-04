@@ -5,19 +5,18 @@ from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 import os
+from sbuck_style import SBUCKStyle
 
 from datetime import datetime, timedelta
 
 
-base_path = os.path.dirname(os.path.realpath(__file__))
-base_path = base_path.replace("\\", "/")
 
 class SelectMyCarInfoScreen(QWidget):
     def __init__(self, on_confirm_callback):
         super().__init__()
         self.setWindowTitle("iPARKING - 차량번호 확인")
         # self.setGeometry(300, 300, 800, 400)
-        self.setStyleSheet("background-color: #252E3E;")
+        self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG};")
         self.car_list = []
 
         layout_space = 20
@@ -26,7 +25,7 @@ class SelectMyCarInfoScreen(QWidget):
 
         # guide label
         guide_label = QLabel()
-        guide_label.setText('<span>\
+        guide_label.setText(f'<span>\
                                 고객님 차량을 선택하신 후 <span style="color: #134F9E;">확인</span> 버튼을 눌러주세요\
                             </span>')
         guide_label.setAlignment(Qt.AlignCenter)
@@ -40,21 +39,9 @@ class SelectMyCarInfoScreen(QWidget):
 
         # confirm button
         confirm_btn = QPushButton("확  인")
-        confirm_btn.setStyleSheet("""
-                                    QPushButton {
-                                        background-color: #134F9E;
-                                        color: #FFFFFF;
-                                        border-radius: 5;
-                                    }
-                                    QPushButton:hover {
-                                        background-color: #0F3F80;
-                                    }
-                                    QPushButton:pressed {
-                                        background-color: #0B2B57;
-                                    }
-                                """)
+        confirm_btn.setStyleSheet(SBUCKStyle.STYLE_CONFIRM_BTN)
         confirm_btn.setFixedSize(250, 50)
-        confirm_btn.setFont(QFont("Arial", 15))
+        confirm_btn.setFont(SBUCKStyle.FONT_BUTTON)
         confirm_btn.clicked.connect(self.click_confirm_btn)
 
         # car list table
@@ -69,6 +56,7 @@ class SelectMyCarInfoScreen(QWidget):
                                             color: white;
                                         }
                                     """)
+        # self.table_list.setStyleSheet(f"color: {SBUCKStyle.COLOR_TEXT}")
         self.table_list.setColumnCount(2)
         self.table_list.setHorizontalHeaderLabels(column_title) # set column title
         self.table_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) # table size stretch
@@ -116,7 +104,7 @@ class SelectMyCarInfoScreen(QWidget):
             self.entry_time = self.table_list.item(row, 1).text()
 
             # update car image
-            car_img = f"{base_path}/img/car_{self.car_number}.png"
+            car_img = f"{SBUCKStyle.BASE_PATH}/img/car_{self.car_number}.png"
             self.car_img_widget.setStyleSheet(f"border-image: url({car_img});\
                                                 background-repeat: no-repeat;\
                                                 background-position: center;\

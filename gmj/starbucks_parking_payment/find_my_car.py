@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QHBoxLayout, QGridLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
+from sbuck_style import SBUCKStyle
 import os
 
 base_path = os.path.dirname(os.path.realpath(__file__))
@@ -13,7 +14,7 @@ class FindMyCarInfoScreen(QWidget):
         self.on_confirm_callback = on_confirm_callback
         self.setWindowTitle("iPARKING 주차정산기")
         # self.setGeometry(300, 300, 600, 400)
-        self.setStyleSheet("background-color: #252E3E;")
+        self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
 
         btn_size_x, btn_size_y = 70, 70
 
@@ -52,19 +53,16 @@ class FindMyCarInfoScreen(QWidget):
             for dialog_text in row:
                 btn = QPushButton(dialog_text)
                 btn.clicked.connect(self.handle_button_click)
-                btn.setStyleSheet("background-color: #252E3E;\
-                                    color: #FFFFFF;")
+                btn.setStyleSheet(SBUCKStyle.get_button_style(SBUCKStyle.COLOR_BG))
                 btn.setFixedSize(btn_size_x, btn_size_y)
-                btn.setFont(QFont("Arial", 17))
+                btn.setFont(SBUCKStyle.FONT_BUTTON)
 
                 if dialog_text == "취소":
-                    btn.setStyleSheet("background-color: #FF0000;\
-                                        color: #FFFFFF;")
-                    btn.setFont(QFont("Arial", 12))
+                    btn.setStyleSheet(SBUCKStyle.get_button_style(SBUCKStyle.COLOR_CANCEL))
+                    btn.setFont(SBUCKStyle.FONT_BUTTON)
                 elif dialog_text == "확인":
-                    btn.setStyleSheet("background-color: #0000FF;\
-                                        color: #FFFFFF;")
-                    btn.setFont(QFont("Arial", 12))
+                    btn.setStyleSheet(SBUCKStyle.get_button_style(SBUCKStyle.COLOR_CONFIRM))
+                    btn.setFont(SBUCKStyle.FONT_BUTTON)
                 dialog_layout.addWidget(btn, i, j)
                 j += 1
             i += 1

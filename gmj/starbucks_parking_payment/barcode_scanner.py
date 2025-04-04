@@ -34,6 +34,8 @@ class BarcodeScannerWorker(QObject):
             ret, frame = self.cap.read()
             if not ret:
                 continue
+
+            frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             
             processed_frame, barcode_info, detected = self.recognize_barcode(frame)
             self.frameCaptured.emit(processed_frame)
@@ -58,18 +60,6 @@ class BarcodeScannerWorker(QObject):
             cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                         0.9, (0, 255, 0), 2)
             winsound.Beep(1000, 200)
-            # print(type(barcode_data))
-            
-            # try:
-            #     obj_nowdate = datetime.strptime(barcode_data[:14], "%Y%m%d%H%M%S")
-            #     formatted_date = obj_nowdate.strftime("%Y-%m-%d")
-            #     formatted_time = obj_nowdate.strftime("%H:%M:%S")
-            #     info = {'date': formatted_date, 'time': formatted_time, 'price': barcode_data[14:]}
-            # except ValueError:
-            # #     info = {'date': 'Invalid', 'time': 'Invalid', 'price': barcode_data[14:]}
-            # obj_nowdate = datetime.strptime(barcode_data.strip('-')[0], "%Y%m%d%H%M%S")
-            # free_amount = barcode_data.strip('-')[1]
-            # info = {'datetime':obj_nowdate, 'price':free_amount}
             return frame, barcode_data, True
         return frame, barcode_data, False
     

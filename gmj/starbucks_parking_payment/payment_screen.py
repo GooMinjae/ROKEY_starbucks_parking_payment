@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLay
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import Qt, QTimer
 from exit_screen import ExitScreen  # ExitScreen 호출
+from sbuck_style import SBUCKStyle
 
 class PaymentScreen(QWidget):
     def __init__(self, car_number, entry_time_str, discount_amount):
@@ -91,7 +92,7 @@ class PaymentScreen(QWidget):
         for i, (title, value) in enumerate(labels):
             title_item = QTableWidgetItem(title)
             title_item.setTextAlignment(Qt.AlignCenter)
-            title_item.setFont(QFont("Arial", 12, QFont.Bold))
+            title_item.setFont(SBUCKStyle.FONT_MAIN)
             title_item.setBackground(QColor("#325156"))
             title_item.setForeground(QColor("white"))
 
@@ -133,7 +134,7 @@ class PaymentScreen(QWidget):
         self.setLayout(main_layout)
 
         # 2초 후 ExitScreen으로 이동
-        QTimer.singleShot(2000, self.show_exit_screen)
+        # QTimer.singleShot(2000, self.show_exit_screen)
 
     def show_exit_screen(self):
         """ExitScreen으로 전환"""
@@ -150,7 +151,7 @@ if __name__ == "__main__":
         discount_amount=3500
     )
     screen.setWindowTitle("I PARKING - 차량 요금 정산 화면")
-    screen.resize(600, 300)
+    screen.resize(700, 400)
     # screen.resize(700, 350)
     screen.show()
     sys.exit(app.exec_())

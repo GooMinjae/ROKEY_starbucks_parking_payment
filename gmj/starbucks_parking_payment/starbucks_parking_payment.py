@@ -1,5 +1,6 @@
 from find_my_car import FindMyCarInfoScreen
 from select_my_car_minseok import SelectMyCarInfoScreen # minseok
+from sbuck_style import SBUCKStyle
 
 import sys
 from PyQt5.QtWidgets import QApplication, QStackedWidget
@@ -21,12 +22,6 @@ class MainWindow(QStackedWidget):
     def handle_number_input(self, number):
         print(f"[입력된 차량번호] {number}")
 
-        # 더미 데이터 조회처럼 처리
-        # dummy_data = [
-        #     {"번호": f"{number}가 {number}", "입차시간": "2025-03-26 09:00:00"},
-        #     {"번호": f"{number}가 {number}", "입차시간": "2025-03-26 08:45:00"},
-        # ]
-        
         entry_time = datetime.now()
         dummy_data = [
             {"번호": f"123가 {number}", "입차시간": (entry_time - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")},
@@ -44,7 +39,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.setWindowTitle("iPARKING")
-    window.setStyleSheet("background-color: #252E3E;")
+    window.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
     window.resize(600, 300)
     window.show()
     sys.exit(app.exec())
