@@ -15,7 +15,6 @@ class ExitScreen(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("Exit Screen")
-        self.resize(600, 300)
         self.setStyleSheet(SBUCKStyle.STYLE_EXIT_SCREEN)
 
         # ───── 이미지 로드 ─────
