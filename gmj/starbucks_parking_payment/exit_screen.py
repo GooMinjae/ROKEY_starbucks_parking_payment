@@ -1,41 +1,54 @@
 import sys
 import pyttsx3
+import os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from os import _exit
+from sbuck_style import SBUCKStyle
 
 class ExitScreen(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("I PARKING 주차정산기 - 정산 완료")
-        self.setFixedSize(400, 400)
-        
+        self.init_ui()
+        self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
+
+    def init_ui(self):
+        self.setWindowTitle("Exit Screen")
+        self.resize(600, 300)
+        self.setStyleSheet(SBUCKStyle.STYLE_EXIT_SCREEN)
+
+        # ───── 이미지 로드 ─────
+        base_path = SBUCKStyle.BASE_PATH
+        image_path = f'{base_path}/img/icons/check_img.png'
+
+        check_img = QLabel()
+        if os.path.exists(image_path):
+            pixmap = QPixmap(image_path).scaled(150, 150, Qt.KeepAspectRatio)
+        else:
+            pixmap = QPixmap(150, 150)
+            pixmap.fill(Qt.darkGray)
+
+        check_img.setPixmap(pixmap)
+        check_img.setAlignment(Qt.AlignCenter)
+
+        # ───── 감사 메시지 ─────
+        label = QLabel("이용해 주셔서 \n 감사합니다")
+        label.setStyleSheet(SBUCKStyle.STYLE_LABEL_END)
+
+        # ───── 레이아웃 ─────
         layout = QVBoxLayout()
+        layout.addWidget(check_img)
+        layout.addWidget(label)
         layout.setAlignment(Qt.AlignCenter)
-
-        # Text Label
-        self.text_label = QLabel("이용해 주셔서\n감사합니다")
-        self.text_label.setFont(QFont("Arial", 20, QFont.Bold))
-        self.text_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.text_label)
-
         self.setLayout(layout)
 
-    def play_voice(self):
+    def speak(self):
         engine = pyttsx3.init()
-        engine.setProperty('voice',r'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_KO-KR_HEAMI_11.0')
-        engine.setProperty('rate', 140)
         engine.say("이용해 주셔서 감사합니다.")
         engine.runAndWait()
-        self.close()
-    
-    def closeEvent(self, event):
-        _exit(0)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ExitScreen()
     window.show()
-    window.play_voice()
     sys.exit(app.exec_())

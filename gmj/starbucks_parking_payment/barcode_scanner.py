@@ -81,8 +81,6 @@ if __name__ == "__main__":
         frame, barcode_data, detected = worker.recognize_barcode(frame)
         cv2.imshow("Barcode Scanner", frame)
 
-
-
         if detected:
             obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
             free_amount = barcode_data.split('-')[1]

@@ -14,6 +14,8 @@ from datetime import datetime, timedelta
 class MainWindow(QStackedWidget):
     def __init__(self):
         super().__init__()
+        self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)  # ✅ 메인 고정
+        self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG};")
 
         self.find_car = FindMyCarInfoScreen(self.handle_number_input)
         self.select_car = SelectMyCarInfoScreen(self.handle_car_selection)
@@ -21,11 +23,11 @@ class MainWindow(QStackedWidget):
         self.payment = PaymentScreen(self.handle_timer)
         self.final = ExitScreen()
 
-        self.addWidget(self.find_car)   # index 0
-        self.addWidget(self.select_car)  # index 1
-        self.addWidget(self.barcode_screen)  # index 2
-        self.addWidget(self.payment)  # index 3
-        self.addWidget(self.final)  # index 4
+        self.addWidget(self.find_car)
+        self.addWidget(self.select_car)
+        self.addWidget(self.barcode_screen)
+        self.addWidget(self.payment)
+        self.addWidget(self.final)
 
         self.setCurrentIndex(0)
 
@@ -62,7 +64,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.setWindowTitle("iPARKING")
     window.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
-    window.resize(600, 300)
+    window.resize(600, 500)
     window.show()
     sys.exit(app.exec())
 
