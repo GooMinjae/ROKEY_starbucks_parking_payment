@@ -15,7 +15,8 @@ Thread 사용 이유
 
 class BarcodeScannerWorker(QObject):
     frameCaptured = pyqtSignal(object)  # 프레임 업데이트 신호
-    barcodeDetected = pyqtSignal(str)  # 바코드 정보 신호
+    barcodeDetected = pyqtSignal(str)   # 바코드 정보 신호
+    errorOccurred = pyqtSignal(str)     # 에러 발생 시그널 추가
 
     def __init__(self):
         super().__init__()
@@ -33,7 +34,8 @@ class BarcodeScannerWorker(QObject):
         while self.running:
             ret, frame = self.cap.read()
             if not ret:
-                continue
+                self.errorOccurred.emit("카메라를 열 수 없습니다.")
+                break
 
             frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             
@@ -76,7 +78,8 @@ if __name__ == "__main__":
     while True:
         ret, frame = cap.read()
         if not ret:
-            continue
+            print("카메라를 열 수 없습니다.")
+            break
 
         frame, barcode_data, detected = worker.recognize_barcode(frame)
         cv2.imshow("Barcode Scanner", frame)

@@ -81,6 +81,7 @@ class BarcodeScannerApp(QWidget):
         self.scanner_worker = BarcodeScannerWorker()
         self.scanner_worker.frameCaptured.connect(self.update_frame)
         self.scanner_worker.barcodeDetected.connect(self.display_barcode_info)
+        self.scanner_worker.errorOccurred.connect(self.handle_camera_error)
         self.scanner_worker.start()
 
     def update_frame(self, frame):
@@ -105,6 +106,12 @@ class BarcodeScannerApp(QWidget):
         print(f"[스캔 결과] {barcode_data}")
         self.on_barcode_callback(barcode_data)
         self.close_app()
+
+    def handle_camera_error(self, error_msg):
+        self.video_label.setText(error_msg)
+        self.barcode_info.setText("카메라 연결 실패\n잠시 후 다시 시도해주세요.")
+        self.scan_button.setEnabled(True)
+        self.scanner_worker.stop()
 
     def clicked_cancel_button(self):
         self.on_barcode_callback("00000000000000-0000")
