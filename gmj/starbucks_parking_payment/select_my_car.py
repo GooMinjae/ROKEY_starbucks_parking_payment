@@ -80,6 +80,7 @@ class SelectMyCarInfoScreen(QWidget):
             self.table_list.setItem(i, 0, QTableWidgetItem(value["번호"]))
             self.table_list.setItem(i, 1, QTableWidgetItem(value["입차시간"]))
         self.table_list.selectRow(0)
+        self.car_select()
 
     def car_select(self):
         self.selected_rows = self.table_list.selectionModel().selectedRows()
