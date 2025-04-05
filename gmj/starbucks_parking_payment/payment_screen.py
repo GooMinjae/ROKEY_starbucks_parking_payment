@@ -1,184 +1,105 @@
-import sys
-import os
-from datetime import datetime
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
-from PyQt5.QtGui import QPixmap, QFont, QColor
+from sys import argv
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QGridLayout
+from PyQt5.QtGui import QFont ,QPixmap
 from PyQt5.QtCore import Qt, QTimer
-from exit_screen import ExitScreen  # ExitScreen 호출
-from sbuck_style import SBUCKStyle
+from exit_screen import ExitScreen
 
-class PaymentScreen(QWidget):
-    def __init__(self, on_timer_callback):
+
+class ParkingInfoTable(QWidget):
+    def __init__(self, callback, car_info, park_info):
         super().__init__()
-        self.setStyleSheet("background-color: #1E2D3D; color: white;")
-        self.on_timer_callback = on_timer_callback
-        
-        # # 차량 정보
-        # obj_nowdate = datetime.strptime(barcode_data.split('-')[0], "%Y%m%d%H%M%S")
-        # discount_amount = barcode_info.split('-')[1]
+        self.callback = callback
+        [self.car_num, self.car_path] = car_info
+        [self.entry_time, self.parking_time, self.parking_fee, self.free_fee, self.pay_amount] = park_info
 
-        # self.car_number = car_number
-        # self.entry_time = datetime.strptime(entry_time_str, "%Y.%m.%d %H:%M:%S")
-        # self.discount = discount_amount
-        # self.now = datetime.now()
-        
-        # # 요금 계산
-        # self.duration_str, self.fee, self.payment = self.calculate_fee()
-        
-        # # 차량 이미지 파일명 설정
-        # image_name = f"car_{car_number}.png"
-        # self.init_ui(image_name)
-    
-    def calculate_fee(self):
-        """주차 요금 계산"""
-        elapsed = self.now - self.entry_time
-        total_minutes = int(elapsed.total_seconds() // 60)
-        hours = total_minutes // 60
-        minutes = total_minutes % 60
-        duration_str = f"{hours}시간 {minutes}분" if hours > 0 else f"{minutes}분"
+        self.setWindowTitle("I PARKING 주차정산기 - 차량 요금 정산")
+        main_layout = QHBoxLayout()
+        car_layout = QVBoxLayout()
+        info_layout = QGridLayout()
+        info_layout.setSpacing(0)
 
-        # 요금 정책
-        if total_minutes <= 30:
-            fee = 0
-        else:
-            charged_minutes = total_minutes - 30
-            units = (charged_minutes + 9) // 10  # 10분 단위 올림
-            fee = units * 500
-        
-        payment = max(fee - self.discount, 0)
-        return duration_str, fee, payment
+        # Car Image
+        self.img_lbl = QLabel()
+        self.img_lbl.setPixmap(QPixmap())
+        self.img_lbl.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap(self.car_path).scaled(300, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.img_lbl.setPixmap(pixmap)
+        car_layout.addWidget(self.img_lbl)
 
-    def init_ui(self, image_name):
-        """UI 초기화"""
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(script_dir, "img", image_name)
+        # Car Number
+        self.plate_lbl = QLabel(self.car_num)
+        self.plate_lbl.setFont(QFont("Arial", 20))
+        self.plate_lbl.setAlignment(Qt.AlignCenter)
+        car_layout.addWidget(self.plate_lbl)
+        main_layout.addLayout(car_layout)
 
-        # 차량 이미지 및 번호
-        car_image = QLabel()
-        if os.path.exists(image_path):
-            pixmap = QPixmap(image_path).scaled(200, 150, Qt.KeepAspectRatio)
-        else:
-            pixmap = QPixmap(200, 150)
-            pixmap.fill(Qt.darkGray)
-        car_image.setPixmap(pixmap)
-
-        car_number = QLabel(self.car_number)
-        car_number.setFont(QFont("Arial", 18, QFont.Bold))
-        car_number.setStyleSheet("background-color: white; color: black; padding: 8px; border-radius: 5px;")
-
-        left_layout = QVBoxLayout()
-        left_layout.addWidget(car_image, alignment=Qt.AlignCenter)
-        left_layout.addWidget(car_number, alignment=Qt.AlignCenter)
-
-        # 정산 정보 테이블
-        table = QTableWidget(5, 2)
-        table.verticalHeader().setVisible(False)
-        table.horizontalHeader().setVisible(False)
-        table.setFixedSize(302, 202)
-        table.setColumnWidth(0, 100)
-        table.setColumnWidth(1, 200)
-        table.setSelectionMode(QTableWidget.NoSelection)
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
-        table.setStyleSheet("border: 1px solid #555; font-size: 14px;")
-
-        for i in range(5):
-            table.setRowHeight(i, 40)
-
-        # 테이블 데이터 입력
+        # Payment Infomation
         labels = [
-            ("입차 시각", self.entry_time.strftime("%Y.%m.%d %H:%M:%S")),
-            ("주차 시간", self.duration_str),
-            ("주차 요금", f"{self.fee:,} 원"),
-            ("할인 금액", f"-{self.discount:,} 원"),
-            ("결제 금액", f"{self.payment:,} 원")
+            ("입차 시각", self.entry_time),
+            ("주차 시간", self.parking_time),
+            ("주차 요금", self.parking_fee),
+            ("할인 금액", self.free_fee),
+            ("결제 금액", self.pay_amount),
         ]
 
-        for i, (title, value) in enumerate(labels):
-            title_item = QTableWidgetItem(title)
-            title_item.setTextAlignment(Qt.AlignCenter)
-            title_item.setFont(SBUCKStyle.FONT_MAIN)
-            title_item.setBackground(QColor("#325156"))
-            title_item.setForeground(QColor("white"))
+        for i, (key, value) in enumerate(labels):
+            key_label = QLabel(key)
+            value_label = QLabel(value)
 
-            value_item = QTableWidgetItem(value)
-            value_item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            value_item.setFont(QFont("Arial", 14, QFont.Bold))
-            value_item.setBackground(QColor("white"))
-            value_item.setForeground(QColor("black"))
+            key_label.setFont(QFont("Arial", 10))
+            key_label.setAlignment(Qt.AlignCenter)
+            key_label.setFixedWidth(120)
+            value_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            if key == "할인 금액":
+                key_label.setStyleSheet("border: 1px solid gray; padding: 6px; background-color: #2979ff; color: white;")
+                value_label.setFont(QFont("Arial", 11, QFont.Bold))
+                value_label.setStyleSheet("border: 1px solid gray; padding: 6px; color: #2979ff;")
+            elif key == "결제 금액":
+                key_label.setStyleSheet("border: 1px solid gray; padding: 6px; background-color: #d32f2f; color: white;")
+                value_label.setFont(QFont("Arial", 14, QFont.Bold))
+                value_label.setStyleSheet( "border: 1px solid gray; padding: 6px; color: #d32f2f;")
+            else:
+                key_label.setStyleSheet("border: 1px solid gray; padding: 6px; background-color: #f0f0f0;")
+                value_label.setFont(QFont("Arial", 11, QFont.Bold))
+                value_label.setStyleSheet("border: 1px solid gray; padding: 6px;")
 
-            # 할인 및 결제 금액 배경색 변경
-            if "할인" in title:
-                title_item.setBackground(QColor("#014d97"))
-                value_item.setForeground(QColor("#014d97"))
-            elif "결제" in title:
-                title_item.setBackground(QColor("#b43832"))
-                value_item.setForeground(QColor("#b43832"))
+            info_layout.addWidget(key_label, i, 0)
+            info_layout.addWidget(value_label, i, 1)
 
-            table.setItem(i, 0, title_item)
-            table.setItem(i, 1, value_item)
-
-        right_layout = QVBoxLayout()
-        right_layout.addWidget(table)
-
-        # 상단 레이아웃
-        top_layout = QHBoxLayout()
-        top_layout.addLayout(left_layout)
-        top_layout.addLayout(right_layout)
-
-        # 안내 문구
-        notice = QLabel("할인카드 또는 쿠폰을 접촉하여\n주차 요금을 할인받을 수 있습니다")
-        notice.setAlignment(Qt.AlignCenter)
-        notice.setFont(QFont("Arial", 12))
-        notice.setStyleSheet("margin-top: 20px;")
-
-        # 전체 레이아웃
-        main_layout = QVBoxLayout()
-        main_layout.addLayout(top_layout)
-        main_layout.addWidget(notice)
+        main_layout.addLayout(info_layout)
         self.setLayout(main_layout)
 
-        # 2초 후 ExitScreen으로 이동
-        # QTimer.singleShot(2000, self.show_exit_screen)
-        QTimer.singleShot(2000, self.on_timer_callback)
-
-    # def show_exit_screen(self):
-    #     """ExitScreen으로 전환"""
-    #     self.exit_window = ExitScreen()
-    #     self.exit_window.show()
-    #     self.close()
-
-    def load_car_data(self, barcode_info, car_number, entry_time_str):
-        self.car_number = car_number
-        self.entry_time_str = entry_time_str
-        self.barcode_info = barcode_info
-
-        # 차량 정보
-        obj_nowdate = datetime.strptime(barcode_info.split('-')[0], "%Y%m%d%H%M%S")
-        discount_amount = int(barcode_info.split('-')[1])
-
-        self.entry_time = datetime.strptime(self.entry_time_str, "%Y-%m-%d %H:%M:%S")
-        self.discount = discount_amount
-        self.now = datetime.now()
-        
-        # 요금 계산
-        self.duration_str, self.fee, self.payment = self.calculate_fee()
-        
-        # 차량 이미지 파일명 설정
-        image_name = f"car_{self.car_number}.png"
-        self.init_ui(image_name)
+        QTimer.singleShot(2000, self.callback)
 
 
-# 실행 테스트
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    screen = PaymentScreen()
-    screen.setWindowTitle("I PARKING - 차량 요금 정산 화면")
-    screen.resize(700, 400)
-    # screen.resize(700, 350)
-    screen.load_car_data(
-            barcode_info="2025041224815-5000",
-            car_number="112가 4567",
-            entry_time_str="2025-04-02 13:00:00",
-        )
-    screen.show()
-    sys.exit(app.exec_())
+if __name__ == '__main__':
+    from os import path
+
+    class AppController:
+        def __init__(self):
+            base_path = path.dirname(path.realpath(__file__))
+            base_path = base_path.replace("\\", "/")
+            carNum = '112가 4567'
+
+            carInfo = [carNum, f"{base_path}/img/car_{carNum}.png"]
+            parkInfo = ["2014.11.18 08:19:22",
+                        "2시간 38분",
+                        "14,500 원",
+                        "3,500 원",
+                        "11,000 원"]
+            
+            self.app = QApplication(argv)
+            self.parking_screen = ParkingInfoTable(self.show_exit_screen, carInfo, parkInfo)
+            self.exitScreen = ExitScreen()
+
+        def show_exit_screen(self):
+            self.parking_screen.close()
+            self.exitScreen.show()
+            self.exitScreen.play_voice()
+
+        def run(self):
+            self.parking_screen.show()
+            exit(self.app.exec_())
+    
+    controller = AppController()
+    controller.run()
