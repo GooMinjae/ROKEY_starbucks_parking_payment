@@ -27,7 +27,7 @@ class SelectMyCarInfoScreen(QWidget):
         # ───── 차량 이미지 위젯 ─────
         self.car_img_widget = QWidget()
         self.car_img_widget.setFixedSize(250, 250)
-        default_img_path = f"{SBUCKStyle.BASE_PATH}/img/default_car.png"
+        default_img_path = f"{SBUCKStyle.BASE_PATH}/img/cars/default_car.png"
         self.car_img_widget.setStyleSheet(SBUCKStyle.STYLE_CAR_IMAGE_BOX % default_img_path)
 
         # ───── 확인 버튼 ─────
@@ -85,7 +85,7 @@ class SelectMyCarInfoScreen(QWidget):
             self.car_number = self.table_list.item(row, 0).text()
             self.entry_time = self.table_list.item(row, 1).text()
 
-            car_img = f"{SBUCKStyle.BASE_PATH}/img/car_{self.car_number}.png"
+            car_img = f"{SBUCKStyle.BASE_PATH}/img/cars/car_{self.car_number}.png"
             self.car_img_widget.setStyleSheet(SBUCKStyle.STYLE_CAR_IMAGE_BOX % car_img)
 
     def click_confirm_btn(self):

@@ -1,5 +1,5 @@
 from find_my_car import FindMyCarInfoScreen
-from select_my_car_minseok import SelectMyCarInfoScreen # minseok
+from select_my_car import SelectMyCarInfoScreen
 from barcode_scanner_screen import BarcodeScannerApp
 from payment_screen import PaymentScreen
 from exit_screen import ExitScreen
@@ -8,14 +8,16 @@ from sbuck_style import SBUCKStyle
 import sys
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QStackedWidget
+from PyQt5.QtGui import QIcon
 from datetime import datetime, timedelta
 
 # 메인 윈도우: 화면 전환을 담당하는 QStackedWidget
 class MainWindow(QStackedWidget):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)  # ✅ 메인 고정
+        self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)  # 메인 고정
         self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG};")
+        self.setWindowIcon(QIcon(f"{SBUCKStyle.BASE_PATH}/img/icons/logo.png"))
 
         self.find_car = FindMyCarInfoScreen(self.handle_number_input)
         self.select_car = SelectMyCarInfoScreen(self.handle_car_selection)
@@ -66,5 +68,7 @@ if __name__ == "__main__":
     window.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}")
     window.resize(600, 500)
     window.show()
-    sys.exit(app.exec())
+    # sys.exit(app.exec())
+    app.exec_()
+    window.barcode_screen.close_app()
 

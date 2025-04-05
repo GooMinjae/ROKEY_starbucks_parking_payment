@@ -36,7 +36,7 @@ class PaymentScreen(QWidget):
 
     def init_ui(self, image_name):
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(script_dir, "img", image_name)
+        image_path = os.path.join(script_dir, "img/cars", image_name)
 
         # ───── 차량 이미지 박스 ─────
         car_image = QLabel()
