@@ -99,8 +99,7 @@ class FindMyCarInfoScreen(QWidget):
         text = sender.text()
 
         if text == "취소":
-            for field in self.num_field:
-                field.clear()
+            self.reset()
         elif text == "확인":
             value = "".join(field.text() for field in self.num_field)
             if 0 < len(value) <= 4:
@@ -112,6 +111,10 @@ class FindMyCarInfoScreen(QWidget):
                 if field.text() == "":
                     field.setText(text)
                     break
+
+    def reset(self):
+        for field in self.num_field:
+            field.clear()
 
 if __name__ == "__main__":
     def handle_number_input(input_number):

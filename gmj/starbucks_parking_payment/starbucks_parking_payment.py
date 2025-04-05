@@ -20,10 +20,10 @@ class MainWindow(QStackedWidget):
         self.setWindowIcon(QIcon(f"{SBUCKStyle.BASE_PATH}/img/icons/logo.png"))
 
         self.find_car = FindMyCarInfoScreen(self.handle_number_input)
-        self.select_car = SelectMyCarInfoScreen(self.handle_car_selection)
-        self.barcode_screen = BarcodeScannerApp(self.handle_detected_barcode)
-        self.payment = PaymentScreen(self.handle_timer)
-        self.final = ExitScreen()
+        self.select_car = SelectMyCarInfoScreen(self.handle_car_selection, self.handle_home_button)
+        self.barcode_screen = BarcodeScannerApp(self.handle_detected_barcode, self.handle_home_button)
+        self.payment = PaymentScreen(self.handle_timer, self.handle_home_button)
+        self.final = ExitScreen(self.handle_home_button)
 
         self.addWidget(self.find_car)
         self.addWidget(self.select_car)
@@ -59,6 +59,10 @@ class MainWindow(QStackedWidget):
         self.setCurrentIndex(4)
         QTimer.singleShot(100, self.final.speak)  # 0.1초 후 TTS 실행
 
+    def handle_home_button(self):
+        self.find_car.reset()
+        self.barcode_screen.close_app()
+        self.setCurrentIndex(0)
 
 
 if __name__ == "__main__":

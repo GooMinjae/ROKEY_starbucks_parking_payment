@@ -8,12 +8,13 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
 from datetime import datetime
 from barcode_scanner import BarcodeScannerWorker
-from sbuck_style import SBUCKStyle
+from sbuck_style import SBUCKStyle, HomeButtonLayout
 
 class BarcodeScannerApp(QWidget):
-    def __init__(self, on_barcode_callback):
+    def __init__(self, on_barcode_callback, on_home_btn_callback):
         super().__init__()
         self.on_barcode_callback = on_barcode_callback
+        self.on_home_btn_callback = on_home_btn_callback
         self.scanner_worker = None
         self.initUI()
         self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
@@ -23,9 +24,10 @@ class BarcodeScannerApp(QWidget):
         self.resize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
         self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG};")
 
+        home_layout = HomeButtonLayout(self.on_home_btn_callback)
         # ───── 카메라 화면 ─────
         self.video_label = QLabel("카메라 화면")
-        self.video_label.setFixedSize(320, 200)
+        self.video_label.setFixedSize(320, 160)
         self.video_label.setAlignment(Qt.AlignCenter)
         self.video_label.setStyleSheet(SBUCKStyle.STYLE_VIDEO_FRAME)
 
@@ -38,24 +40,24 @@ class BarcodeScannerApp(QWidget):
 
         # ───── 스캔 버튼 ─────
         self.scan_button = QPushButton("스캔 시작")
-        self.scan_button.setFixedHeight(50)
+        self.scan_button.setFixedHeight(45)
         self.scan_button.setFixedWidth(160)
         self.scan_button.setFont(SBUCKStyle.FONT_BUTTON)
         self.scan_button.setStyleSheet(SBUCKStyle.STYLE_CONFIRM_BTN)
         self.scan_button.clicked.connect(self.start_scanning)
 
         # ───── 취소 버튼 ─────
-        self.cancle_button = QPushButton("취소")
-        self.cancle_button.setFixedHeight(50)
-        self.cancle_button.setFixedWidth(160)
-        self.cancle_button.setFont(SBUCKStyle.FONT_BUTTON)
-        self.cancle_button.setStyleSheet(SBUCKStyle.STYLE_CANCEL_BTN)
-        self.cancle_button.clicked.connect(self.clicked_cancle_button)
+        self.cancel_button = QPushButton("취소")
+        self.cancel_button.setFixedHeight(45)
+        self.cancel_button.setFixedWidth(160)
+        self.cancel_button.setFont(SBUCKStyle.FONT_BUTTON)
+        self.cancel_button.setStyleSheet(SBUCKStyle.STYLE_CANCEL_BTN)
+        self.cancel_button.clicked.connect(self.clicked_cancel_button)
 
         # ───── 내부 컨테이너로 중앙 정렬 ─────
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.scan_button)
-        button_layout.addWidget(self.cancle_button)
+        button_layout.addWidget(self.cancel_button)
 
         container = QWidget()
         container_layout = QVBoxLayout()
@@ -67,10 +69,9 @@ class BarcodeScannerApp(QWidget):
         container.setLayout(container_layout)
 
         main_layout = QVBoxLayout()
-        main_layout.addStretch(1)
+        main_layout.addLayout(home_layout)
         main_layout.addWidget(container, alignment=Qt.AlignCenter)
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.addStretch(1)
         main_layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(main_layout)
 
@@ -97,7 +98,6 @@ class BarcodeScannerApp(QWidget):
         except (ValueError):
             self.barcode_info.setText("바코드 형식이 맞지 않습니다.")
             self.close_app()
-            self.scan_button.setEnabled(True) # 재인식 시도
             return
         self.barcode_info.setText(
             f"날짜: {obj_nowdate.date()}\n시간: {obj_nowdate.time()}\n가격: {free_amount}"
@@ -106,21 +106,26 @@ class BarcodeScannerApp(QWidget):
         self.on_barcode_callback(barcode_data)
         self.close_app()
 
-    def clicked_cancle_button(self):
+    def clicked_cancel_button(self):
         self.on_barcode_callback("00000000000000-0000")
+        self.close_app()
 
     def close_app(self):
         try:
+            self.scanner_worker.frameCaptured.disconnect(self.update_frame)
             self.scanner_worker.stop()
-            print('스레드 종료')
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass
+        self.scan_button.setEnabled(True) # 재인식 시도
+        self.barcode_info.setText("바코드가 없으신가요?\n[취소] 버튼을 눌러주세요.")  # 상태 표시
+        self.video_label.setText("카메라 화면")
+
 if __name__ == '__main__':
     def dummy_callback(data):
         print("Scanned barcode:", data)
 
     app = QApplication(sys.argv)
-    window = BarcodeScannerApp(dummy_callback)
+    window = BarcodeScannerApp(dummy_callback, lambda: print('home'))
     window.show()
     app.exec_()
     # 바코드 미인식 후 종료 예외처리

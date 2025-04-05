@@ -3,19 +3,21 @@ import os
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout,
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QSpacerItem
 )
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import Qt, QTimer
-from sbuck_style import SBUCKStyle
+from sbuck_style import SBUCKStyle, HomeButtonLayout
 
 
 class PaymentScreen(QWidget):
-    def __init__(self, on_timer_callback):
+    def __init__(self, on_timer_callback, on_home_btn_callback):
         super().__init__()
         self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
         self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG}; color: white;")
         self.on_timer_callback = on_timer_callback
+        self.on_home_btn_callback = on_home_btn_callback
+        self.setup_ui()
 
     def calculate_fee(self):
         elapsed = self.now - self.entry_time
@@ -34,53 +36,85 @@ class PaymentScreen(QWidget):
         payment = max(fee - self.discount, 0)
         return duration_str, fee, payment
 
-    def init_ui(self, image_name):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(script_dir, "img/cars", image_name)
+    def setup_ui(self):
+        home = HomeButtonLayout(self.on_home_btn_callback)
 
-        # ───── 차량 이미지 박스 ─────
-        car_image = QLabel()
-        car_image.setFixedSize(220, 160)
-        car_image.setScaledContents(True)
-        car_image.setStyleSheet(SBUCKStyle.STYLE_IMAGE_BOX)
+        # 이미지와 차량 번호 라벨
+        self.car_image_label = QLabel()
+        self.car_image_label.setFixedSize(220, 160)
+        self.car_image_label.setScaledContents(True)
+        self.car_image_label.setStyleSheet(SBUCKStyle.STYLE_IMAGE_BOX)
 
-        if os.path.exists(image_path):
-            pixmap = QPixmap(image_path)
-        else:
-            pixmap = QPixmap(car_image.size())
-            pixmap.fill(Qt.darkGray)
-        car_image.setPixmap(pixmap)
+        self.car_number_label = QLabel()
+        self.car_number_label.setFont(QFont("Arial", 20, QFont.Bold))
+        self.car_number_label.setStyleSheet(SBUCKStyle.STYLE_CAR_NUMBER_LABEL)
 
-        # ───── 차량 번호 라벨 강조 ─────
-        car_number = QLabel(self.car_number)
-        car_number.setFont(QFont("Arial", 20, QFont.Bold))
-        car_number.setStyleSheet(SBUCKStyle.STYLE_CAR_NUMBER_LABEL)
-
-        # ───── 이미지 컨테이너 ─────
         image_container = QWidget()
         image_container.setFixedWidth(340)
         image_layout = QVBoxLayout()
         image_layout.setAlignment(Qt.AlignCenter)
         image_layout.setContentsMargins(0, 0, 0, 0)
         image_layout.setSpacing(10)
-        image_layout.addWidget(car_image)
-        image_layout.addWidget(car_number)
+        image_layout.addWidget(self.car_image_label)
+        image_layout.addWidget(self.car_number_label)
         image_container.setLayout(image_layout)
 
-        # ───── 요금 테이블 ─────
-        table = QTableWidget(5, 2)
-        table.verticalHeader().setVisible(False)
-        table.horizontalHeader().setVisible(False)
-        table.setFixedSize(302, 202)
-        table.setColumnWidth(0, 100)
-        table.setColumnWidth(1, 200)
-        table.setSelectionMode(QTableWidget.NoSelection)
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
-        table.setStyleSheet(SBUCKStyle.PAYMENT_STYLE_TABLE)
+        # 요금 테이블
+        self.payment_table = QTableWidget(5, 2)
+        self.payment_table.verticalHeader().setVisible(False)
+        self.payment_table.horizontalHeader().setVisible(False)
+        self.payment_table.setFixedSize(302, 202)
+        self.payment_table.setColumnWidth(0, 100)
+        self.payment_table.setColumnWidth(1, 200)
+        self.payment_table.setSelectionMode(QTableWidget.NoSelection)
+        self.payment_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.payment_table.setStyleSheet(SBUCKStyle.PAYMENT_STYLE_TABLE)
 
         for i in range(5):
-            table.setRowHeight(i, 40)
+            self.payment_table.setRowHeight(i, 40)
 
+        right_layout = QVBoxLayout()
+        right_layout.setSpacing(10)
+        right_layout.addWidget(self.payment_table)
+
+        top_layout = QHBoxLayout()
+        top_layout.setSpacing(30)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.addStretch(1)
+        top_layout.addWidget(image_container)
+        top_layout.addLayout(right_layout)
+        top_layout.addStretch(1)
+
+        notice = QLabel("할인카드 또는 쿠폰을 접촉하여\n주차 요금을 할인받을 수 있습니다")
+        notice.setAlignment(Qt.AlignCenter)
+        notice.setFont(QFont("Arial", 12))
+        notice.setStyleSheet("margin-top: 20px;")
+
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.addLayout(home)
+        main_layout.addLayout(top_layout)
+        main_layout.addWidget(notice)
+
+        self.setLayout(main_layout)
+
+    def update_ui_with_data(self, image_name):
+        # 이미지 갱신
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(script_dir, "img/cars", image_name)
+
+        if os.path.exists(image_path):
+            pixmap = QPixmap(image_path)
+        else:
+            pixmap = QPixmap(self.car_image_label.size())
+            pixmap.fill(Qt.darkGray)
+        self.car_image_label.setPixmap(pixmap)
+
+        # 차량 번호
+        self.car_number_label.setText(self.car_number)
+
+        # 요금 테이블
         labels = [
             ("입차 시각", self.entry_time.strftime("%Y.%m.%d %H:%M:%S")),
             ("주차 시간", self.duration_str),
@@ -109,37 +143,11 @@ class PaymentScreen(QWidget):
                 title_item.setBackground(QColor("#b43832"))
                 value_item.setForeground(QColor("#b43832"))
 
-            table.setItem(i, 0, title_item)
-            table.setItem(i, 1, value_item)
-
-        right_layout = QVBoxLayout()
-        right_layout.setSpacing(10)
-        right_layout.addWidget(table)
-
-        # ───── 상단 레이아웃 ─────
-        top_layout = QHBoxLayout()
-        top_layout.setSpacing(30)
-        top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.addStretch(1)
-        top_layout.addWidget(image_container)
-        top_layout.addLayout(right_layout)
-        top_layout.addStretch(1)
-
-        # ───── 안내 문구 ─────
-        notice = QLabel("할인카드 또는 쿠폰을 접촉하여\n주차 요금을 할인받을 수 있습니다")
-        notice.setAlignment(Qt.AlignCenter)
-        notice.setFont(QFont("Arial", 12))
-        notice.setStyleSheet("margin-top: 20px;")
-
-        # ───── 전체 레이아웃 ─────
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.addLayout(top_layout)
-        main_layout.addWidget(notice)
-        self.setLayout(main_layout)
+            self.payment_table.setItem(i, 0, title_item)
+            self.payment_table.setItem(i, 1, value_item)
 
         QTimer.singleShot(2000, self.on_timer_callback)
+
 
     def load_car_data(self, barcode_info, car_number, entry_time_str):
         self.car_number = car_number
@@ -153,13 +161,13 @@ class PaymentScreen(QWidget):
 
         self.duration_str, self.fee, self.payment = self.calculate_fee()
         image_name = f"car_{self.car_number}.png"
-        self.init_ui(image_name)
+        self.update_ui_with_data(image_name)
 
 
 # 테스트 실행
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    screen = PaymentScreen(lambda: print("다음 화면으로 이동"))
+    screen = PaymentScreen(lambda: print("다음 화면으로 이동"), lambda: print('home'))
     screen.setWindowTitle("I PARKING - 차량 요금 정산 화면")
     screen.load_car_data(
         barcode_info="2025041224815-5000",

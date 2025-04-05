@@ -1,4 +1,6 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtWidgets import QPushButton, QHBoxLayout
 import os
 
 class SBUCKStyle:
@@ -162,7 +164,7 @@ class SBUCKStyle:
     """
 
     STYLE_EXIT_SCREEN = f"""
-        background-color: {{SBUCKStyle.COLOR_BG}};
+        background-color: {COLOR_BG};
     """
 
     # 차량 이미지 박스
@@ -202,3 +204,30 @@ class SBUCKStyle:
                 padding: 8px 16px;
             }}
         """
+
+
+class HomeButtonLayout(QHBoxLayout):
+    def __init__(self, on_button_callback):
+        super().__init__()
+        self.on_button_callback = on_button_callback
+
+        self.home = QPushButton()
+        self.home.setFixedSize(30, 30)
+        self.home.setStyleSheet(f"""
+        QPushButton {{
+            background-color: {SBUCKStyle.COLOR_BG};
+            border-image: url({SBUCKStyle.BASE_PATH}/img/icons/home.png);
+        }}
+        QPushButton:hover {{
+            border-image: url({SBUCKStyle.BASE_PATH}/img/icons/home_hover.png);
+        }}
+        QPushButton:pressed {{
+            border-image: url({SBUCKStyle.BASE_PATH}/img/icons/home_hover.png);
+        }}
+    """)
+        self.home.clicked.connect(self.on_button_callback)
+
+        self.addStretch(1)
+        self.addSpacing(0)
+        self.addWidget(self.home, alignment=Qt.AlignRight)
+

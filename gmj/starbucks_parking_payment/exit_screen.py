@@ -4,11 +4,12 @@ import os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from sbuck_style import SBUCKStyle
+from sbuck_style import SBUCKStyle, HomeButtonLayout
 
 class ExitScreen(QWidget):
-    def __init__(self):
+    def __init__(self, on_home_btn_callback):
         super().__init__()
+        self.on_home_btn_callback = on_home_btn_callback
         self.init_ui()
         self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
 
@@ -30,6 +31,7 @@ class ExitScreen(QWidget):
 
         check_img.setPixmap(pixmap)
         check_img.setAlignment(Qt.AlignCenter)
+        home_layout = HomeButtonLayout(self.on_home_btn_callback)
 
         # ───── 감사 메시지 ─────
         label = QLabel("이용해 주셔서 \n 감사합니다")
@@ -37,6 +39,7 @@ class ExitScreen(QWidget):
 
         # ───── 레이아웃 ─────
         layout = QVBoxLayout()
+        layout.addLayout(home_layout)
         layout.addWidget(check_img)
         layout.addWidget(label)
         layout.setAlignment(Qt.AlignCenter)
@@ -49,6 +52,6 @@ class ExitScreen(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ExitScreen()
+    window = ExitScreen(lambda: print('home'))
     window.show()
     sys.exit(app.exec_())

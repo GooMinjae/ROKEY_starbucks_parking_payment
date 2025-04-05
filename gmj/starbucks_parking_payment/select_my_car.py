@@ -5,24 +5,26 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QVBoxLayout
 )
 from PyQt5.QtCore import Qt
-from sbuck_style import SBUCKStyle
+from sbuck_style import SBUCKStyle, HomeButtonLayout
 from datetime import datetime, timedelta
 import os
 
 class SelectMyCarInfoScreen(QWidget):
-    def __init__(self, on_confirm_callback):
+    def __init__(self, on_confirm_callback, on_home_btn_callback):
         super().__init__()
         self.setWindowTitle("iPARKING - 차량번호 확인")
         self.setStyleSheet(f"background-color: {SBUCKStyle.COLOR_BG};")
         self.car_list = []
         self.on_confirm_callback = on_confirm_callback
+        self.on_home_btn_callback = on_home_btn_callback
         self.setFixedSize(SBUCKStyle.WINDOW_WIDTH, SBUCKStyle.WINDOW_HEIGHT)
 
+        home_layout = HomeButtonLayout(self.on_home_btn_callback)
         # ───── 안내 라벨 ─────
         guide_label = QLabel("고객님 차량을 선택하신 후 <span style='color: #134F9E;'>확인</span> 버튼을 눌러주세요")
         guide_label.setAlignment(Qt.AlignCenter)
         guide_label.setStyleSheet(SBUCKStyle.STYLE_LABEL_BOLD)
-        guide_label.setFixedHeight(70)
+        guide_label.setFixedHeight(30)
 
         # ───── 차량 이미지 위젯 ─────
         self.car_img_widget = QWidget()
@@ -65,6 +67,7 @@ class SelectMyCarInfoScreen(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.addLayout(home_layout)
         main_layout.addWidget(guide_label)
         main_layout.addLayout(car_info_layout)
         self.setLayout(main_layout)
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     ]
 
     app = QApplication(sys.argv)
-    win = SelectMyCarInfoScreen(handle_car_selection)
+    win = SelectMyCarInfoScreen(handle_car_selection, lambda: print('home'))
     win.load_data(dummy_data)
     win.show()
     app.exec_()
