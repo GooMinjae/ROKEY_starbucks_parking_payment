@@ -11,13 +11,13 @@ graph TD;
     style F fill:#bbf,stroke:#333,stroke-width:2px,color:#000;
     style H fill:#f96,stroke:#333,stroke-width:2px,color:#000;
 
-    A[MainWindow] -->|입력된 차량 번호| B[FindMyCarInfoScreen]
-    B -->|선택된 차량 정보| C[SelectMyCarInfoScreen]
-    C -->|인식된 바코드 정보| D[BarcodeScannerApp]
-    D -->|결제 완료| E[PaymentScreen]
-    E -->|종료| F[ExitScreen]
+    A[MainWindow] --> B[FindMyCarInfoScreen]
+    B -->|입력된 차량 번호| C[SelectMyCarInfoScreen]
+    C -->|선택된 차량 정보| D[BarcodeScannerApp]
+    D -->|인식된 바코드 정보| E[PaymentScreen]
+    E -->|결제 완료| F[ExitScreen]
     
     subgraph Barcode
-        H[BarcodeScannerWorker] --> D
+        H[BarcodeScannerWorker] -->|바코드 정보| D
     end
 ```
