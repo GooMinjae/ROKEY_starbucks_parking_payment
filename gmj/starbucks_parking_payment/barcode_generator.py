@@ -4,7 +4,7 @@ from barcode.writer import ImageWriter
 from datetime import datetime
 
 class BarcodeGenerator:
-    def __init__(self, free_amount="500000", directory=None):
+    def __init__(self, free_amount="5000", directory=None):
         """
         BarcodeGenerator 클래스 초기화
         :param free_amount: 바코드에 포함될 무료 금액 (기본값: 5000)
@@ -42,5 +42,5 @@ class BarcodeGenerator:
 
 # 외부에서 호출 예시
 if __name__ == "__main__":
-    barcode_generator = BarcodeGenerator(free_amount="500000")  # 원하는 금액으로 초기화
+    barcode_generator = BarcodeGenerator(free_amount="5000")  # 원하는 금액으로 초기화
     barcode_generator.create_bar_code()  # 바코드 생성
